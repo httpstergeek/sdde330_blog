@@ -7,12 +7,16 @@ from datetime import datetime
 
 @dataclass
 class User:
-    user_id: UUID
     username: str
     bio: str
     email: str
-    create_date: datetime
-    last_post_date: Union[None, datetime]
+
+
+@dataclass
+class UserReturn(User):
+    user_id: Optional[UUID]
+    created_date: Optional[datetime]
+    last_post_date: Optional[datetime]
 
 
 @dataclass
@@ -35,7 +39,7 @@ class BlogDocument:
 
 
 @dataclass
-class comment:
+class Comment:
     comment_id: UUID
     content: str
     create_date: datetime
