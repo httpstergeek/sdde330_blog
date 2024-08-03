@@ -21,11 +21,16 @@ class UserReturn(User):
 
 @dataclass
 class Blog:
-    blog_id: UUID
     title: str
-    creator_id: UUID
-    create_date: datetime
-    last_post_date: Union[None, datetime]
+    creator_id: Optional[UUID]
+
+
+@dataclass
+class BlogReturn(Blog):
+    blog_id: Optional[UUID]
+    title: str
+    created_date: Optional[datetime]
+    last_post_date: Optional[datetime]
 
 
 @dataclass

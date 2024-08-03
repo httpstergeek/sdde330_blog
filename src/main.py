@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from connector import Database
 import configparser
-from routers import users
+from routers import users, blogs
 
 cfg = configparser.ConfigParser()
 cfg.read("blog.conf")
@@ -20,6 +20,7 @@ async def startup():
 
 
 app.include_router(users.router)
+app.include_router(blogs.router)
 
 
 @app.get("/")

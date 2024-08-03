@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request
 from models import User, UserReturn
-from typing import Dict, Any
 
 router = APIRouter(
     prefix="/api/user", tags=["user"], responses={404: {"description": "Not found"}}
@@ -31,8 +30,10 @@ async def create_user(user: User, req: Request):
 @router.get("/{user_id}", response_model=UserReturn)
 async def get_user(user_id: str, req: Request):
     query = f"SELECT * FROM users WHERE user_id = '{user_id}'"
-    user = await req.app.state.db.fetch_rows(query)
-    return UserReturn(**user[0])
+    rsp = await req.app.state.db.fetch_rows(query)
+    if not rsp:
+        raise HTTPException(status_code=404, detail="username does not exists")
+    return UserReturn(**rsp[0])
 
 
 @router.put("/{user_id}", response_model=User)
