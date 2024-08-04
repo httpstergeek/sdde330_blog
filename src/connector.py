@@ -2,10 +2,16 @@ from dataclasses import dataclass
 from psycopg_pool import ConnectionPool
 import json
 import asyncpg
+import re
 
 
 @dataclass
 class Database:
+    """
+    Database object used for connectiong to postgres.
+    Configures connection pulling to reduce managment cost of connections
+    """
+
     user: str
     password: str
     host: str
@@ -47,3 +53,23 @@ class Database:
                 print(e)
             finally:
                 await self._connection_pool.release(self.con)
+
+
+def sql_search(query: str):
+    """
+    Returns query input for searching table
+    used in to_tsquwery form to_tsvector
+    """
+    user_query = re.sub("[^A-Za-z0-9 ]+", "", query)
+    user_query = user_query.split(" ")
+    fmt_query = " & ".join(f"{item}" for item in user_query)
+    return fmt_query
+
+
+async def query_handler(
+    db: Database, query: str, code: int, message: str = "Resource does not exist"
+):
+    rsp = await db.fetch_rows(query)
+    if not rsp:
+        raise HTTPException(status_code=404, detail="username does not exists")
+    return rsp

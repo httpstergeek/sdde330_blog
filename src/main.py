@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from connector import Database
 import configparser
-from routers import users, blogs
+from routers import users, blogs, documents, comments
 
 cfg = configparser.ConfigParser()
 cfg.read("blog.conf")
@@ -21,10 +21,10 @@ async def startup():
 
 app.include_router(users.router)
 app.include_router(blogs.router)
+app.include_router(documents.router)
+app.include_router(comments.router)
 
 
 @app.get("/")
 async def root():
-    x = await app.state.db.fetch_rows("SELECT * FROM USERS;")
-    print(type(x[0]), dict(x[0]))
     return {"message": "My Blog API"}
