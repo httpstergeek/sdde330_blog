@@ -1,0 +1,14 @@
+[API]
+title=Blog Api
+description=Bernies Blog Api
+version="0.0.1"
+
+
+[DB]
+User=<DB_USER>
+Password=<DB_USER_PASSWORD>
+Host=<IP_ADDRESS>
+Database=<DB_NAME>
+Port=<PORT>
+
+
