@@ -40,7 +40,6 @@ class Blog:
 @dataclass
 class BlogReturn(Blog):
     blog_id: Optional[UUID]
-    title: str
     created_date: Optional[datetime]
     last_post_date: Optional[datetime]
 
@@ -61,17 +60,17 @@ class BlogDocument(Content):
 class BlogDocumentReturn(BlogDocument):
     document_id: UUID
     created_date: datetime
-    author_id: UUID
-    blog_id: UUID
 
 
 @dataclass
 class Comment(Content):
+    content = str
+    author_id: UUID
     document_id: UUID
 
 
 @dataclass
 class CommentReturn(Comment):
+    created_date: datetime
     comment_id: UUID
-    create_date: datetime
-    parent_comment_id: Union[None, UUID]
+    # parent_comment_id: Optional[UUID] = None

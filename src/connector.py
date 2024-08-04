@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from psycopg_pool import ConnectionPool
+from fastapi import HTTPException
+from typing import Optional
 import json
 import asyncpg
 import re
@@ -67,9 +69,13 @@ def sql_search(query: str):
 
 
 async def query_handler(
-    db: Database, query: str, code: int, message: str = "Resource does not exist"
+    db: Database,
+    query: str,
+    code: int,
+    message: str = "Resource does not exist",
+    skip_error: Optional[bool] = False,
 ):
     rsp = await db.fetch_rows(query)
-    if not rsp:
-        raise HTTPException(status_code=404, detail="username does not exists")
+    if not rsp and not skip_error:
+        raise HTTPException(status_code=code, detail=message)
     return rsp

@@ -1,28 +1,24 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from connector import Database
+from loaders import routers
+from configs import SERVER, DB
 import configparser
-from routers import users, blogs, documents, comments
+
 
 cfg = configparser.ConfigParser()
 cfg.read("blog.conf")
 
-server_info = dict(cfg.items("API"))
-connection_info = dict(cfg.items("DB"))
-app = FastAPI(**server_info)
+app = FastAPI(**SERVER)
+routers(app)
 
 
 @app.on_event("startup")
 async def startup():
-    db_inst = Database(**connection_info)
+    # Configuring DB with connection pulling and storing application state for resulablity
+    db_inst = Database(**DB)
     await db_inst.connect()
     app.state.db = db_inst
-
-
-app.include_router(users.router)
-app.include_router(blogs.router)
-app.include_router(documents.router)
-app.include_router(comments.router)
 
 
 @app.get("/")
