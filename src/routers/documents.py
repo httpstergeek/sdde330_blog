@@ -70,7 +70,7 @@ async def get_document_comments(document_id: str, req: Request):
 
 
 @router.put("/{document_id}", response_model=BlogDocumentReturn)
-async def update_document(doc: BlogDocument, req: Request):
+async def update_document(document_id: str, doc: BlogDocument, req: Request):
     """
     Update blog documents
     """
