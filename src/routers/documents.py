@@ -24,6 +24,7 @@ async def create_document(doc: BlogDocument, req: Request):
     """
     Create blog documents
     """
+    print(doc)
     query = (
         f"INSERT INTO blog_documents (title, content, author_id, blog_id)"
         f"VALUES ('{doc.title}', '{doc.content}', '{doc.author_id}', '{doc.blog_id}')"
@@ -78,7 +79,7 @@ async def update_document(document_id: str, doc: BlogDocument, req: Request):
     rsp = await query_handler(req.app.state.db, query, 404, "Blog does not exist")
     update_values = ", ".join(["%s = '%s'" % (k, v) for (k, v) in doc.__dict__.items()])
     query = (
-        f"UPDATE users SET {update_values} WHERE document_id = '{document_id}'"
+        f"UPDATE blog_docouments SET {update_values} WHERE document_id = '{document_id}'"
         "RETURNING *;"
     )
     rsp = await query_handler(req.app.state.db, query, 500, "unable to upate resource")
