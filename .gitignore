@@ -1,0 +1,11 @@
+node_module
+*.pem
+blog.conf
+.DS_Store
+*.zip
+*.gz
+test.py
+*.swp
+assignment*
+__pycache__
+
