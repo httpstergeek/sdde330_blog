@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, ActionFunctionArgs, redirect } from "@remix-run/node";
-import { Form, useLoaderData, useActionData, useNavigation } from "@remix-run/react";
+import { Form, useLoaderData, useActionData, useNavigation, Outlet, Link } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { getPost } from "~/models/post.server";
@@ -58,13 +58,12 @@ export const loader = async ({
 
   const post = await getPost(params.document_id);
   invariant(post, `Post not found: ${params.document_id}`);
-
   return json(post);
 };
 const inputClassName =
   "w-full rounded border border-gray-500 px-2 py-1 text-lg";
 
-export default function PostSlug() {
+export default function PostDocumentId() {
   const post  = useLoaderData<typeof loader>();
   const errors = useActionData<typeof action>();
   const navigation = useNavigation();
@@ -91,7 +90,6 @@ export default function PostSlug() {
           <input type="text" name="author_id" className={inputClassName} defaultValue={post?.author_id || ""} />
         </label>
       </p>
-
       <p>
         <label>
           Blog ID:{" "}
