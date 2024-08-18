@@ -3,18 +3,25 @@ import { json, ActionFunctionArgs, redirect } from "@remix-run/node";
 import { Form, useLoaderData, useActionData, useNavigation, Outlet, Link } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import { getPost } from "~/models/post.server";
-import { createPost } from "~/models/post.server";
+import { getPost, createPost, deletePost } from "~/models/post.server";
 
 export const action = async ({
   request,
 }: ActionFunctionArgs) => {
   const formData = await request.formData();
 
+  const intent = formData.get("intent");
   const title = formData.get("title");
   const blog_id = formData.get("blog_id");
   const author_id = formData.get("author_id");
   const content = formData.get("content");
+  const document_id = formData.get("document_id");
+
+  if (intent === "delete") {
+      invariant(typeof document_id === "string", "document_id must be a string");
+      await deletePost(document_id);
+      return redirect("/posts/admin");
+    }
 
   const errors = {
     title: title ? null : "Title is required",
@@ -50,7 +57,6 @@ export const action = async ({
   return redirect("/posts/admin");
 };
 
-
 export const loader = async ({
   params,
 }: LoaderFunctionArgs) => {
@@ -58,7 +64,7 @@ export const loader = async ({
 
   const post = await getPost(params.document_id);
   invariant(post, `Post not found: ${params.document_id}`);
-  return json(post);
+  return json({ ...post, document_id: params.document_id });
 };
 const inputClassName =
   "w-full rounded border border-gray-500 px-2 py-1 text-lg";
@@ -72,6 +78,7 @@ export default function PostDocumentId() {
   );
   return (
     <Form method="post">
+      <input type="hidden" name="document_id" value={post.document_id} />
       <p>
         <label>
           Post Title:{" "}
@@ -108,15 +115,31 @@ export default function PostDocumentId() {
         <br />
         <textarea id="content" rows={20} name="content" className={`${inputClassName} font-mono`} defaultValue={post?.content || ""} />
       </p>
-      <p className="text-right">
-        <button
-          type="submit"
-          className="rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
-          disabled={isCreating}
-        >
-          {isCreating ? "Updating..." : "Update Post"}
-        </button>
-      </p>
+
+      <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5 sm:space-y-0">
+         <p className="text-right">
+          <button
+            type="submit"
+            name="intent"
+            value="delete"
+            className="rounded bg-red-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
+            disabled={isCreating}
+          >
+          {isCreating ? "Deleting..." : "Delete"}
+          </button>
+        </p>
+        <p className="text-right">
+          <button
+            type="submit"
+            name="intent"
+            value="update"
+            className="rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
+            disabled={isCreating}
+          >
+            {isCreating ? "Updating..." : "Update Post"}
+          </button>
+        </p>
+      </div>
     </Form>
   );}
 

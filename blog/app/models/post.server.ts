@@ -30,6 +30,28 @@ export async function getPosts(): Promise<Array<Post>> {
   }
 }
 
+export async function deletePost(document_id: string): Promise<Post> {
+  console.log(document_id)
+  try {
+    const response = await fetch('http://localhost:8000/api/document/' + document_id, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data: Post = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    throw error;
+  }
+}
+
 export async function getPost(document_id: string): Promise<Post> {
   console.log(document_id)
   try {
