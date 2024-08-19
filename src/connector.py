@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from psycopg_pool import ConnectionPool
 from fastapi import HTTPException
 from typing import Optional
 import json
