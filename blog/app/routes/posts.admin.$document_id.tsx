@@ -94,7 +94,7 @@ export default function PostDocumentId() {
           {errors?.author_id ? (
             <em className="text-red-600">{errors.author_id}</em>
           ) : null}
-          <input type="text" name="author_id" className={inputClassName} defaultValue={post?.author_id || ""} />
+          <input type="text" name="author_id" className={inputClassName} defaultValue={post.author_id} />
         </label>
       </p>
       <p>
@@ -103,7 +103,7 @@ export default function PostDocumentId() {
           {errors?.blog_id ? (
             <em className="text-red-600">{errors.blog_id}</em>
           ) : null}
-          <input type="text" name="blog_id" className={inputClassName} defaultValue={post?.blog_id || ""} />
+          <input type="text" name="blog_id" className={inputClassName} defaultValue={post.blog_id} />
         </label>
       </p>
       <p>
