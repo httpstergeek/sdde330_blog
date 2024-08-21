@@ -16,6 +16,7 @@ async def get_documents(req: Request):
     """
     query = "SELECT * FROM blog_documents;"
     rsp = await query_handler(req.app.state.db, query, 404, "No resources")
+    req.app.log.info(f"Retriving blog documents")
     return [BlogDocumentReturn(**dict(document)) for document in rsp]
 
 
@@ -31,6 +32,7 @@ async def create_document(doc: BlogDocument, req: Request):
         "RETURNING *;"
     )
     rsp = await query_handler(req.app.state.db, query, 500, "Unable to create document")
+    req.app.log.info(f"Creating blog document")
     return BlogDocumentReturn(**rsp[0])
 
 
@@ -46,6 +48,7 @@ async def search_documents(search: Search, req: Request):
         f"WHERE to_tsvector(title || ' ' || content) @@ to_tsquery('{fmt_search}');"
     )
     rsp = await query_handler(req.app.state.db, query, 404, "No results")
+    req.app.log.info(f"searching blog documents {fmt_search}")
     return [BlogDocumentReturn(**doc) for doc in rsp]
 
 
@@ -56,6 +59,7 @@ async def get_document_details(document_id: str, req: Request):
     """
     query = f"SELECT * FROM blog_documents WHERE document_id = '{document_id}';"
     rsp = await query_handler(req.app.state.db, query, 404, "Document does not exist")
+    req.app.log.info(f"retrieving blog document {document_id}")
     return BlogDocumentReturn(**rsp[0])
 
 
@@ -65,8 +69,8 @@ async def get_document_comments(document_id: str, req: Request):
     Retieve all comments assocaited with blog document.
     """
     query = f"SELECT * FROM comments WHERE document_id = '{document_id}';"
-    print(query)
     rsp = await query_handler(req.app.state.db, query, 404, "No comments found")
+    req.app.log.info(f"retrieving comments document {document_id}")
     return [CommentReturn(**comment) for comment in rsp]
 
 
@@ -83,6 +87,7 @@ async def update_document(document_id: str, doc: BlogDocument, req: Request):
         "RETURNING *;"
     )
     rsp = await query_handler(req.app.state.db, query, 500, "unable to upate resource")
+    req.app.log.info(f"updating document {document_id}")
     return BlogDocumentReturn(**rsp[0])
 
 
@@ -97,4 +102,5 @@ async def update_document(document_id: str, req: Request):
         f"DELETE FROM blog_documents WHERE document_id = '{document_id}' RETURNING *;"
     )
     rsp = await query_handler(req.app.state.db, query, 404, "Unable to delete document")
+    req.app.log.info(f"deleting blog document {document_id}")
     return BlogDocumentReturn(**rsp[0])

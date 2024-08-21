@@ -11,6 +11,7 @@ router = APIRouter(
 async def get_users(req: Request):
     query = "SELECT * FROM USERS;"
     rsp = await query_handler(req.app.state.db, query, 404, "No resources")
+    req.app.log.info(f"retrieving users")
     return [UserReturn(**dict(user)) for user in rsp]
 
 
@@ -20,12 +21,14 @@ async def create_user(user: User, req: Request):
     rsp = await req.app.state.db.fetch_rows(query)
     if rsp:
         raise HTTPException(status_code=404, detail="username already exists")
+    req.app.log.warning(f"user: {user.username}")
     query = (
         f"INSERT INTO users(username, bio, email)"
         f"VALUES ('{user.username}', '{user.bio}', '{user.email}')"
         "RETURNING username, bio, email, user_id, created_date, last_post_date;"
     )
     rsp = await query_handler(req.app.state.db, query, 500, "Failed to create user")
+    req.app.log.info(f"creating user")
     return UserReturn(**rsp[0])
 
 
@@ -33,6 +36,7 @@ async def create_user(user: User, req: Request):
 async def get_user_details(user_id: str, req: Request):
     query = f"SELECT * FROM users WHERE user_id = '{user_id}'"
     rsp = await query_handler(req.app.state.db, query, 404, "username does not exists")
+    req.app.log.info(f"creating user {user_id}")
     return UserReturn(**rsp[0])
 
 
@@ -54,6 +58,7 @@ async def update_user(user_id: str, user: User, req: Request):
         "RETURNING username, bio, email, user_id, created_date, last_post_date;"
     )
     rsp = await query_handler(req.app.state.db, query, 500, "Failed to update user")
+    req.app.log.info(f"updating user {user_id}")
     return User(**rsp[0])
 
 
@@ -61,6 +66,7 @@ async def update_user(user_id: str, user: User, req: Request):
 async def get_user_comments(user_id: str, req: Request):
     query = f"SELECT * FROM comments WHERE author_id = '{user_id}'"
     rsp = await query_handler(req.app.state.db, query, 404, "No comments found")
+    req.app.log.info(f"retrieving comments by user {user_id}")
     return [CommentReturn(**comment) for comment in rsp]
 
 
@@ -68,6 +74,7 @@ async def get_user_comments(user_id: str, req: Request):
 async def get_user_documents(user_id: str, req: Request):
     query = f"SELECT * FROM blog_documents WHERE author_id = '{user_id}'"
     rsp = await query_handler(req.app.state.db, query, 404, "No documents found")
+    req.app.log.info(f"retrieving documents by user {user_id}")
     return [BlogDocumentReturn(**document) for document in rsp]
 
 
@@ -75,5 +82,5 @@ async def get_user_documents(user_id: str, req: Request):
 async def get_user_blog_spaces(user_id: str, req: Request):
     query = f"SELECT * FROM blogs WHERE creator_id = '{user_id}'"
     rsp = await req.app.state.db.fetch_rows(query)
-    print(rsp)
+    req.app.log.info(f"retrieving blog spaces created by user {user_id}")
     return [BlogReturn(**blog) for blog in rsp]

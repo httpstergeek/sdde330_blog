@@ -21,7 +21,11 @@ async def get_blogs(req: Request):
     Retrieves all blog spaces
     """
     query = "SELECT * FROM blogs;"
-    rsp = await query_handler(req.app.state.db, query, 404, "No resources")
+    try:
+        rsp = await query_handler(req.app.state.db, query, 404, "No resources")
+    except HTTPException as e:
+        req.app.log.warning(e)
+    req.app.log.info("Geting all blog spaces")
     return [BlogReturn(**dict(blog)) for blog in rsp]
 
 
@@ -35,6 +39,7 @@ async def create_blog(blog: Blog, req: Request):
         f"VALUES ('{blog.title}', '{blog.creator_id}') "
         "RETURNING *;"
     )
+    req.app.log.info(f"Creating blog  {blog.title}")
     rsp = await query_handler(req.app.state.db, query, 500, "Unable to create blog")
     return BlogReturn(**rsp[0])
 
@@ -49,6 +54,7 @@ async def search_blogs(search: Search, req: Request):
         "SELECT * FROM blogs "
         f"WHERE to_tsvector(title) @@ to_tsquery('english', '{fmt_search}');"
     )
+    req.app.log.info(f"searching blog using {fmt_search}")
     rsp = await query_handler(req.app.state.db, query, 404, "No results")
     return [BlogReturn(**blog) for blog in rsp]
 
@@ -62,6 +68,7 @@ async def get_blog(blog_id: str, req: Request):
     rsp = await query_handler(
         req.app.state.db, query, 404, f"Blog: {blog_id} does not exist"
     )
+    req.app.log.info(f"retrieving blog {blog_id}")
     return BlogReturn(**rsp[0])
 
 
@@ -81,6 +88,7 @@ async def update_blog(blog_id: str, blog: Blog, req: Request):
         f"UPDATE blogs SET {update_values} WHERE blog_id = '{blog_id}' " "RETURNING *;"
     )
     rsp = await query_handler(req.app.state.db, query, 500, "unable to upate resource")
+    req.app.log.info(f"updating blog {blog_id}")
     return BlogReturn(**rsp[0])
 
 
@@ -91,6 +99,7 @@ async def get_blog_documents(blog_id: str, req: Request):
     """
     query = f"SELECT * FROM blog_documents WHERE blog_id = '{blog_id}'"
     rsp = await query_handler(req.app.state.db, query, 404, "No comments found")
+    req.app.log.info(f"retieving blog documents for blog {blog_id}")
     return [BlogDocumentReturn(**doc) for doc in rsp]
 
 
@@ -107,4 +116,5 @@ async def search_blog_documents(blog_id: str, search: Search, req: Request):
         f"to_tsvector(title || ' ' || content) @@ to_tsquery('english', '{fmt_search}');"
     )
     rsp = await query_handler(req.app.state.db, query, 404, "No results")
+    req.app.log.info(f"searching blog documents for blog {blog_id}")
     return [BlogDocumentReturn(**doc) for doc in rsp]

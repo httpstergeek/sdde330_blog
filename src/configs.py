@@ -26,3 +26,4 @@ cfg.read("blog.conf")
 
 SERVER = server_info = dict(cfg.items("API")) | tags
 DB = connection_info = dict(cfg.items("DB"))
+LOG = connection_info = dict(cfg.items("LOG"))
