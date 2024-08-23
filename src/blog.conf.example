@@ -11,4 +11,6 @@ Host=<IP_ADDRESS>
 Database=<DB_NAME>
 Port=<PORT>
 
-
+[LOG]
+Loglevel=INFO
+Logpath=/var/log
