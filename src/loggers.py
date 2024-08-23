@@ -11,5 +11,4 @@ def default_logger(config: Dict):
     )
     logger = logging.getLogger()
     logger.setLevel(config.get("loglevel", "INFO"))
-    logger.info(config)
     return logger
