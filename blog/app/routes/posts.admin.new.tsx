@@ -61,8 +61,8 @@ export default function NewPost() {
   );
   return (
     <Form method="post">
-      <input type="hidden" name="author_id" value="435a0cf9-8e42-4a30-8e62-e3e9d16dd4c2" />
-      <input type="hidden" name="blog_id" value="c2ae7ed8-8951-421b-bcf9-a05efb79211c" />
+      <input type="hidden" name="author_id" value="4f22cb73-e093-479b-8d8b-2375fd16040c" />
+      <input type="hidden" name="blog_id" value="7b25f93f-4b4e-41c5-bcdb-d59f3dd4a677" />
       <p>
         <label>
           Post Title:{" "}
