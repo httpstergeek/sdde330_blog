@@ -61,6 +61,8 @@ export default function NewPost() {
   );
   return (
     <Form method="post">
+      <input type="hidden" name="author_id" value="435a0cf9-8e42-4a30-8e62-e3e9d16dd4c2" />
+      <input type="hidden" name="blog_id" value="c2ae7ed8-8951-421b-bcf9-a05efb79211c" />
       <p>
         <label>
           Post Title:{" "}
@@ -68,25 +70,6 @@ export default function NewPost() {
             <em className="text-red-600">{errors.title}</em>
           ) : null}
           <input type="text" name="title" className={inputClassName} />
-        </label>
-      </p>
-      <p>
-        <label>
-          Author ID:{" "}
-          {errors?.author_id ? (
-            <em className="text-red-600">{errors.author_id}</em>
-          ) : null}
-          <input type="text" name="author_id" className={inputClassName} />
-        </label>
-      </p>
-
-      <p>
-        <label>
-          Blog ID:{" "}
-          {errors?.blog_id ? (
-            <em className="text-red-600">{errors.blog_id}</em>
-          ) : null}
-          <input type="text" name="blog_id" className={inputClassName} />
         </label>
       </p>
       <p>

@@ -74,6 +74,7 @@ async def query_handler(
     message: str = "Resource does not exist",
     skip_error: Optional[bool] = False,
 ):
+    print(query)
     rsp = await db.fetch_rows(query)
     if not rsp and not skip_error:
         raise HTTPException(status_code=code, detail=message)

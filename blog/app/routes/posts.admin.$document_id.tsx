@@ -1,15 +1,14 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, ActionFunctionArgs, redirect } from "@remix-run/node";
-import { Form, useLoaderData, useActionData, useNavigation, Outlet, Link } from "@remix-run/react";
+import { Form, useLoaderData, useActionData, useNavigation } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import { getPost, createPost, deletePost } from "~/models/post.server";
+import { getPost, updatePost, deletePost } from "~/models/post.server";
 
 export const action = async ({
   request,
 }: ActionFunctionArgs) => {
   const formData = await request.formData();
-
   const intent = formData.get("intent");
   const title = formData.get("title");
   const blog_id = formData.get("blog_id");
@@ -25,8 +24,6 @@ export const action = async ({
 
   const errors = {
     title: title ? null : "Title is required",
-    blog_id: blog_id ? null : "Blog Id is required",
-    author_id: author_id ? null : "Author Id is required",
     content: content ? null : "Content is required",
   };
   const hasErrors = Object.values(errors).some(
@@ -35,7 +32,6 @@ export const action = async ({
   if (hasErrors) {
     return json(errors);
   }
-
   invariant(
     typeof title === "string",
     "title must be a string"
@@ -45,6 +41,10 @@ export const action = async ({
     "blog_id must be a string"
   );
   invariant(
+    typeof document_id === "string",
+    "document_id must be a string"
+  );
+  invariant(
     typeof author_id === "string",
     "author_id must be a string"
   );
@@ -52,8 +52,7 @@ export const action = async ({
     typeof content === "string",
     "content must be a string"
   );
-
-  await createPost({ title, author_id, blog_id, content });
+  await updatePost({ title, author_id, blog_id, document_id, content });
   return redirect("/posts/admin");
 };
 
@@ -78,7 +77,9 @@ export default function PostDocumentId() {
   );
   return (
     <Form method="post">
-      <input type="hidden" name="document_id" value={post.document_id} />
+      <input type="hidden" name="document_id" className={inputClassName} value={post.document_id} />
+      <input type="hidden" name="author_id" value="435a0cf9-8e42-4a30-8e62-e3e9d16dd4c2" />
+      <input type="hidden" name="blog_id" value="c2ae7ed8-8951-421b-bcf9-a05efb79211c" />
       <p>
         <label>
           Post Title:{" "}
@@ -86,24 +87,6 @@ export default function PostDocumentId() {
             <em className="text-red-600">{errors.title}</em>
           ) : null}
           <input type="text" name="title" className={inputClassName} defaultValue={post.title} />
-        </label>
-      </p>
-      <p>
-        <label>
-          Author ID:{" "}
-          {errors?.author_id ? (
-            <em className="text-red-600">{errors.author_id}</em>
-          ) : null}
-          <input type="text" name="author_id" className={inputClassName} defaultValue={post.author_id} />
-        </label>
-      </p>
-      <p>
-        <label>
-          Blog ID:{" "}
-          {errors?.blog_id ? (
-            <em className="text-red-600">{errors.blog_id}</em>
-          ) : null}
-          <input type="text" name="blog_id" className={inputClassName} defaultValue={post.blog_id} />
         </label>
       </p>
       <p>
@@ -115,9 +98,8 @@ export default function PostDocumentId() {
         <br />
         <textarea id="content" rows={20} name="content" className={`${inputClassName} font-mono`} defaultValue={post?.content || ""} />
       </p>
-
       <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5 sm:space-y-0">
-         <p className="text-right">
+        <p className="text-right">
           <button
             type="submit"
             name="intent"

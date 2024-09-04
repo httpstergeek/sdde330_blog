@@ -98,3 +98,34 @@ export async function createPost(
     throw error;
   }
 }
+
+export async function updatePost(
+  post: Pick<Post, "title" | "blog_id" | "author_id" | "content"> & { document_id: string }
+): Promise<Post> {
+  try {
+    const req = {
+        title: post.title,
+        author_id: post.author_id,
+        blog_id: post.blog_id,
+        content: post.content,
+     }
+    console.log(JSON.stringify(req));
+    const response = await fetch(`http://localhost:8000/api/document/${post.document_id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(req),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data: Post = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating post:', error);
+    throw error;
+  }
+}

@@ -28,7 +28,7 @@ async def create_document(doc: BlogDocument, req: Request):
     print(doc)
     query = (
         f"INSERT INTO blog_documents (title, content, author_id, blog_id)"
-        f"VALUES ('{doc.title}', '{doc.content}', '{doc.author_id}', '{doc.blog_id}')"
+        f"VALUES ($${doc.title}$$, $${doc.content}$$, '{doc.author_id}', '{doc.blog_id}')"
         "RETURNING *;"
     )
     rsp = await query_handler(req.app.state.db, query, 500, "Unable to create document")
@@ -79,11 +79,13 @@ async def update_document(document_id: str, doc: BlogDocument, req: Request):
     """
     Update blog documents
     """
-    query = f"SELECT * FROM blogs_documents WHERE document_id = '{document_id}'"
+    query = f"SELECT * FROM blog_documents WHERE document_id = '{document_id}';"
     rsp = await query_handler(req.app.state.db, query, 404, "Blog does not exist")
-    update_values = ", ".join(["%s = '%s'" % (k, v) for (k, v) in doc.__dict__.items()])
+    update_values = ", ".join(
+        ["%s = $$%s$$" % (k, v) for (k, v) in doc.__dict__.items()]
+    )
     query = (
-        f"UPDATE blog_docouments SET {update_values} WHERE document_id = '{document_id}'"
+        f"UPDATE blog_documents SET {update_values} WHERE document_id = '{document_id}'"
         "RETURNING *;"
     )
     rsp = await query_handler(req.app.state.db, query, 500, "unable to upate resource")
